@@ -1,0 +1,32 @@
+/*
+  less 语法
+  可以在 header 中的 style 中进行查看
+  .style1{
+  width: 100px;
+  height: 100px;
+}
+
+.box1{
+  // 直接嵌套，但是 style1 也会进行一次预处理，造成浪费
+  .style1();
+}
+
+.style2(@width){
+  width: @width;
+  height: @width;
+}
+
+// 函数式调用，不会造成重复编译
+.box2{
+  .style2(200px);
+}
+*/
+
+// 鼠标经过上移阴影动画
+.hoverShadow () {
+  transition: all .5s;
+  &:hover {
+    transform: translate3d(0,-3px,0);
+    box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+  }
+}
