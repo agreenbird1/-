@@ -16,7 +16,6 @@ instance.interceptors.request.use(config => {
   const { user } = store.state.user
   if (user.token) {
     // 设置请求头设置token
-    console.log(store.state.user.token)
     config.headers.Authorization = `Bearer ${user.token}`
   }
   return config
@@ -36,7 +35,6 @@ instance.interceptors.response.use(res => res.data, error => {
     // 获取当前路由页信息 当当前页面路由信息类似为 /user?a=1&b=2 时候,会出现截断导致信息出现错误,故需要转码
     // 组件里 $route.path and $route.fullPath 直接获取路径
     const fullPath = encodeURIComponent(router.currentRoute.value.fullPath) // router.Properties
-    console.log('path', fullPath)
     // 跳转后需要返回当前跳转的页面,所以需要携带当前页面的路由信息
     router.push(`/login?redirectURL=${fullPath}`)
   }
@@ -47,7 +45,6 @@ instance.interceptors.response.use(res => res.data, error => {
 // xx(url, method, requestData)，返回的就是一个 Promise 对象
 export default (url, method, requestData) => {
   // instance 就是一个 axios 实例，请求返回的就是一个 promise 对象，相当于直接封装
-  console.log(instance.prototype)
   return instance({
     url,
     method,

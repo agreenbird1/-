@@ -1,19 +1,35 @@
 <template>
   <!-- 一级路由 -->
-  <nav>顶部通栏</nav>
-  <header>头部区域</header>
-  <div class="main">
-    内容区域
-    <router-view></router-view>
+  <AppNavBar />
+  <AppHeaderSticky />
+  <AppHeader />
+  <div class="app-body">
+    <div class="container">
+      <router-view></router-view>
+    </div>
   </div>
-  <footer>底部区域</footer>
+  <AppFooter />
 </template>
 
 <script>
+import { useStore } from 'vuex'
+import AppNavBar from '@/components/AppNavBar.vue'
+import AppHeader from '@/components/AppHeader.vue'
+import AppFooter from '@/components/AppFooter.vue'
+import AppHeaderSticky from '@/components/AppHeaderSticky.vue'
 export default {
-  name: 'Layout'
+  name: 'Layout',
+  components: { AppNavBar, AppHeader, AppFooter, AppHeaderSticky },
+  setup () {
+    // 加载时获取数据
+    const store = useStore()
+    store.dispatch('category/getList')
+  }
 }
 </script>
 
-<style>
+<style scoped lang="less">
+.app-body {
+  min-height: 600px;
+}
 </style>
