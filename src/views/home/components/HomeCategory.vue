@@ -1,8 +1,9 @@
 <template>
-  <div class="home-category">
+  <div class="home-category" @mouseleave="categoryId = null">
     <ul class="menu">
       <!-- 鼠标移入时候显示弹层，将数据输入 -->
       <li
+        :class="{ active: categoryId === category.id }"
         v-for="category in menuList"
         :key="category.id"
         @mouseenter="categoryId = category.id"
@@ -130,7 +131,8 @@ export default {
       padding-left: 40px;
       height: 50px;
       line-height: 50px;
-      &:hover {
+      &:hover,
+      &.active {
         background: @xtxColor;
       }
       a {
