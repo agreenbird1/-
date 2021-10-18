@@ -21,6 +21,16 @@
             >{{ sub.name }}</RouterLink
           >
         </template>
+        <!-- children 属性不存在时用骨架效果 -->
+        <template v-else>
+          <Skeleton
+            width="50px"
+            height="20px"
+            bg="rgba(255,255,255,.2)"
+            style="margin-right: 5px"
+          />
+          <Skeleton width="40px" height="20px" bg="rgba(255,255,255,.2)" />
+        </template>
       </li>
     </ul>
     <!-- 鼠标移入显示弹层 -->
@@ -72,6 +82,7 @@
 </template>
 
 <script>
+// 加载之初没有显示时候需要显示 loading 效果优化用户体验
 import { computed, reactive, ref } from 'vue'
 import { useStore } from 'vuex'
 import { findBrands } from '@/api/home'
@@ -103,7 +114,6 @@ export default {
     // 定义一个数组存放弹层数据，当前的选择的数据
     // 当里面有brands数据的时候证明这是最后一个
     const LayerThickness = computed(() => {
-      console.log(LayerThickness)
       return menuList.value.find(item => item.id === categoryId.value)
     })
     // 获取品牌推荐数据
@@ -234,6 +244,17 @@ export default {
     .layer {
       display: block;
     }
+  }
+}
+.skeleton {
+  animation: fade 1s linear infinite alternate;
+}
+@keyframes fade {
+  from {
+    opacity: 0.2;
+  }
+  to {
+    opacity: 1;
   }
 }
 </style>

@@ -1,11 +1,14 @@
+import App from '@/App.vue'
+import '@/assets/styles/common.less'
+import UI from '@/components/library'
+import router from '@/router'
+import store from '@/store'
 import 'normalize.css'
 import { createApp } from 'vue'
-import App from './App.vue'
-import './assets/styles/common.less'
-import router from './router'
-import store from './store'
 
 const app = createApp(App)
 app.use(store)
 app.use(router)
+// 自定义全局组件
+app.use(UI)
 app.mount('#app')

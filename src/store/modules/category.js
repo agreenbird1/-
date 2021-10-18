@@ -7,7 +7,8 @@ export default {
     return {
       // 分类信息集合，封装成对象，方便以后进行操作
       // 设置的初识 商品信息分类信息,防止初始加载产生空白
-      list: topCategory.map(category => ({ name: category }))
+      // 设置一个初始id是为了防止刚开始的时候id都是为空而导致鼠标移入时候相等显示出来hover效果
+      list: topCategory.map((category, index) => ({ name: category, id: index + new Date() }))
     }
   },
   mutations: {

@@ -90,7 +90,7 @@ export default {
       height: 132px;
       opacity: 1;
     }
-    z-index: 1;
+    z-index: 100;
     width: 1240px;
     background-color: #fff;
     position: absolute;
