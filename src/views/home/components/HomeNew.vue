@@ -1,6 +1,6 @@
 <template>
   <div class="home-new">
-    <div class="container">
+    <div class="container" ref="target">
       <HomePanel title="新鲜好物" subTitle="新鲜出炉 品质靠谱">
         <!-- 更多部分 -->
         <template #right><More path="/" /></template>
@@ -25,7 +25,7 @@
 </template>
 
 <script>
-import { ref } from 'vue'
+import { getLazyData } from '@/hooks'
 import HomePanel from './HomePanel.vue'
 import HomeSkeleton from './HomeSkeleton.vue'
 import { findNew } from '@/api/home'
@@ -33,14 +33,11 @@ export default {
   name: 'HomeNew',
   components: { HomePanel, HomeSkeleton },
   setup () {
-    const goods = ref([])
-    // 获取推荐的数据
-    findNew().then(res => {
-      goods.value = res.result
-    })
-
+    // 数据懒加载
+    const { result: goods, target } = getLazyData(findNew)
     return {
-      goods
+      goods,
+      target
     }
   }
 }
