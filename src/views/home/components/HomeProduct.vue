@@ -16,7 +16,7 @@
       <div class="box">
         <!-- 添加路径 -->
         <RouterLink class="cover" :to="`/category/${good.id}`">
-          <img :src="good.picture" alt="" />
+          <img v-lazy="good.picture" alt="" />
           <strong class="label">
             <span>{{ good.name }}馆</span>
             <span>{{ good.saleInfo }}</span>
