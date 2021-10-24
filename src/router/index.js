@@ -29,7 +29,11 @@ const routes = [
 
 const router = createRouter({
   history: createWebHashHistory(),
-  routes
+  routes,
+  // 控制路由滚动行为，切换路由界面的时候会自动从底部跳转到顶部
+  scrollBehavior () {
+    return { left: 0, top: 0 }
+  }
 })
 
 export default router

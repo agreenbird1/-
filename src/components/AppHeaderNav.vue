@@ -8,7 +8,7 @@
     <li
       v-for="item in list"
       :key="item.id"
-      @mouseenter="show(item.id)"
+      @mousemove="show(item.id)"
       @mouseleave="hide(item.id)"
     >
       <router-link @click="hide(item.id)" :to="`/category/${item.id}`">{{
@@ -19,7 +19,7 @@
         <ul>
           <!-- 二级导航 -->
           <li v-for="subItem in item.children" :key="subItem.id">
-            <router-link :to="`/category/sub/${item.id}`">
+            <router-link :to="`/category/sub/${subItem.id}`">
               <img :src="subItem.picture" alt="" />
               <p>{{ subItem.name }}</p>
             </router-link>

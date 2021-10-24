@@ -1,7 +1,7 @@
 <template>
   <div class="home-category" @mouseleave="categoryId = null">
     <ul class="menu">
-      <!-- 鼠标移入时候显示弹层，将数据输入 -->
+      <!-- 鼠标移入时候显示弹层，将数据输入 ，改为鼠标移动，因为滚动时候会造成弹层一直显示 -->
       <li
         :class="{ active: categoryId === category.id }"
         v-for="category in menuList"

@@ -1,18 +1,25 @@
 // 扩展vue原有的功能：全局组件，自定义指令，挂载原型方法，注意：没有全局过滤器。
 import defaultImg from '@/assets/images/default.png'
-import Bread from './Bread'
-import BreadItem from './BreadItem'
-import Carousel from './Carousel'
-import More from './More'
-import Skeleton from './Skeleton'
+
+// 正常情况下单个引入组件后，单独注册
+/**
+ * import Skeleton from './Skeleton'
+ * app.component(Skeleton.name, Skeleton)
+ */
+
+// 使用全局注册方法，免得每次进行导入
+
+// 1. 被加载目录  2. 是否加载子目录  3. 加载文件的正则  返沪的函数用来进行导入
+const importFn = require.context('./', false, /\.vue$/)
 
 export default {
   install (app) {
-    app.component(Skeleton.name, Skeleton)
-    app.component(Carousel.name, Carousel)
-    app.component(Bread.name, Bread)
-    app.component(BreadItem.name, BreadItem)
-    app.component(More.name, More)
+    // 通过 importFn 导入导入组件并注册
+    importFn.keys().forEach(path => {
+      // 是模块化的组件，故需用 default 获取
+      const component = importFn(path).default
+      app.component(component.name, component)
+    })
     // 自定义指令
     defineLazyImg(app)
   }
