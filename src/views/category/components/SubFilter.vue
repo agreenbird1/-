@@ -9,7 +9,7 @@
           href="javascript:;"
           v-for="brand in filterData.brands"
           :key="brand.id"
-          @click="filterData.selected = brand.id"
+          @click="changeBrand(brand.id)"
           :class="{ active: filterData.selected === brand.id }"
           >{{ brand.name }}</a
         >
@@ -22,7 +22,7 @@
           href="javascript:;"
           v-for="p in sp.properties"
           :key="p.id"
-          @click="sp.selected = p.id"
+          @click="changeProp(sp, p)"
           :class="{ active: sp.selected === p.id }"
           >{{ p.name }}</a
         >
@@ -36,7 +36,7 @@ import { useRoute } from 'vue-router'
 import { findSubCategoryFilter } from '@/api/category'
 export default {
   name: 'SubFilter',
-  setup () {
+  setup (_, { emit }) {
     const route = useRoute()
     // 获取筛选条件的信息
     const filterData = ref(null)
@@ -56,13 +56,37 @@ export default {
             p.properties.unshift({ id: null, name: '全部' })
           })
           filterData.value = data.result
-          console.log(data.result)
         })
       }
     }, { immediate: true })
 
+    // 定义一个参数集合
+    const filterParams = { brandId: null, attrs: [] }
+    // 品牌选择功能以及属性传递
+    const changeBrand = (brandId) => {
+      // 解决选中问题
+      filterData.value.selected = brandId
+      // 添加参数
+      filterParams.brandId = brandId
+      emit('sort-filter', filterParams)
+    }
+    // 属性改变时的传递与选定功能
+    const changeProp = (sp, p) => {
+      // 解决选中问题
+      sp.selected = p.id
+      // 添加参数属性
+      // 但是不能重复添加,需要去除多个groupname相同的数据
+      // 通过filter的方式去除跟当前重名的元素
+      const arr = filterParams.attrs.filter(group => group.groupName !== sp.name)
+      // 再进行赋值
+      filterParams.attrs = [...arr, { groupName: sp.name, propertyName: p.name }]
+      // 解决
+      emit('sort-filter', filterParams)
+    }
     return {
-      filterData
+      filterData,
+      changeBrand,
+      changeProp
     }
   }
 }
