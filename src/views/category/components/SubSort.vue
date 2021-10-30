@@ -76,15 +76,17 @@ export default {
       // 如果是价格需要判断升序降序
       if (sortField === 'price') {
         sortParams.sortMethod = sortParams.sortMethod ? (sortParams.sortMethod === 'desc' ? 'asc' : 'desc') : 'desc'
+        emit('sort-change', sortParams)
       } else {
         sortParams.sortMethod = null
       }
       // 不是每次重置为空
       // 如果当前选中的重复点击，则不予理会
-      if (sortParams.sortField === sortField) return
-      sortParams.sortField = sortField
-      // 每次改变需要重新发送请求
-      emit('sort-change', sortParams)
+      if (sortParams.sortField !== sortField) {
+        sortParams.sortField = sortField
+        // 每次改变需要重新发送请求
+        emit('sort-change', sortParams)
+      }
     }
     const checkChange = () => {
       // 每次改变需要重新发送请求

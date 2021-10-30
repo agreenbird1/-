@@ -33,7 +33,6 @@ export default {
     const target = ref(null)
     // 使用 vueuse
     useIntersectionObserver(target, ([{ isIntersecting }]) => {
-      console.log('进入可视区啦')
       // 进入可视区后
       if (isIntersecting) {
         // 没有加载完且当前没有加载中
