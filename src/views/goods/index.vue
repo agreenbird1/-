@@ -20,6 +20,7 @@
         </div>
         <div class="spec">
           <GoodsName :goods="product"></GoodsName>
+          <GoodsSku v-if="product" :goods="product" />
         </div>
       </div>
       <!-- 商品推荐 -->
@@ -47,9 +48,10 @@ import GoodsRelevant from './components/GoodsRelevant'
 import GoodsImage from './components/GoodsImage'
 import GoodsSales from './components/GoodsSales.vue'
 import GoodsName from './components/GoodsName.vue'
+import GoodsSku from './components/GoodsSku.vue'
 export default {
   name: 'XtxGoodsPage',
-  components: { GoodsRelevant, GoodsImage, GoodsSales, GoodsName },
+  components: { GoodsRelevant, GoodsImage, GoodsSales, GoodsName, GoodsSku },
   setup () {
     const product = ref(null)
     const route = useRoute()
