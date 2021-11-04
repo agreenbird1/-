@@ -1,5 +1,5 @@
 <template>
-  <div class="xtx-goods-page">
+  <div class="xtx-goods-page" v-if="product">
     <div class="container">
       <!-- 面包屑 -->
       <Bread>
@@ -20,28 +20,42 @@
         </div>
         <div class="spec">
           <GoodsName :goods="product"></GoodsName>
-          <GoodsSku v-if="product" :goods="product" />
+          <GoodsSku @change="getGood" :goods="product" />
+          <Numbox
+            v-model="count"
+            :numCon="numCon"
+            label="数量"
+            :maxValue="product.inventory"
+          />
+          <MyButton type="primary" size="middle" style="margin-top: 20px"
+            >加入购物车</MyButton
+          >
         </div>
       </div>
       <!-- 商品推荐 -->
-      <GoodsRelevant />
+      <GoodsRelevant :goodsId="product.id" />
       <!-- 商品详情 -->
       <div class="goods-footer">
         <div class="goods-article">
           <!-- 商品+评价 -->
-          <div class="goods-tabs"></div>
+          <GoodsTabs />
           <!-- 注意事项 -->
-          <div class="goods-warn"></div>
+          <div class="goods-warn">
+            <GoodsWarn />
+          </div>
         </div>
         <!-- 24热榜+专题推荐 -->
-        <div class="goods-aside"></div>
+        <div class="goods-aside">
+          <GoodsHot />
+          <GoodsHot :type="2" />
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import { nextTick, onMounted, ref, watch } from 'vue'
+import { nextTick, provide, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { findProduct } from '@/api/product'
 import GoodsRelevant from './components/GoodsRelevant'
@@ -49,15 +63,17 @@ import GoodsImage from './components/GoodsImage'
 import GoodsSales from './components/GoodsSales.vue'
 import GoodsName from './components/GoodsName.vue'
 import GoodsSku from './components/GoodsSku.vue'
-export default {
-  name: 'XtxGoodsPage',
-  components: { GoodsRelevant, GoodsImage, GoodsSales, GoodsName, GoodsSku },
-  setup () {
-    const product = ref(null)
-    const route = useRoute()
-
-    // 分开一个函数，获取数据
-    const getProduct = () => {
+import GoodsTabs from './components/GoodsTabs.vue'
+import GoodsHot from './components/GoodsHot.vue'
+import GoodsWarn from './components/GoodsWarn.vue'
+// 分开一个函数，获取数据
+const getProduct = () => {
+  const product = ref(null)
+  const route = useRoute()
+  // 监视 id 动态获取数据，因为切换路由不会使页面重新渲染，无法获取新的数据
+  watch(() => route.params.id, (newVal) => {
+    // 存在且处于商品详情下才请求，路由匹配
+    if (newVal && `/product/${newVal}` === route.path) {
       findProduct(route.params.id).then(res => {
         // 设置为空，组件就可以被销毁，再次赋值，即可加载
         product.value = null
@@ -66,21 +82,48 @@ export default {
         })
       })
     }
-
-    // 监视 id 动态获取数据，因为切换路由不会使页面重新渲染，无法获取新的数据
-    watch(() => route.params.id, (newVal) => {
-      // 存在且处于商品详情下才请求，路由匹配
-      if (newVal && `/product/${newVal}` === route.path) {
-        getProduct()
+  }, { immediate: true })
+  return product
+}
+export default {
+  name: 'GoodsPage',
+  components: {
+    GoodsRelevant,
+    GoodsImage,
+    GoodsSales,
+    GoodsName,
+    GoodsSku,
+    GoodsTabs,
+    GoodsHot,
+    GoodsWarn
+  },
+  setup () {
+    const product = getProduct()
+    // 选择的数量
+    const count = ref(1)
+    // 控制数量是否可点
+    const numCon = ref(false)
+    const getGood = (selectedGood) => {
+      // 修改当前选中的商品的价格
+      if (selectedGood.skuId) {
+        numCon.value = true
+        product.value.price = selectedGood.price
+        product.value.oldPrice = selectedGood.oldPrice
+        product.value.inventory = selectedGood.inventory
+      } else {
+        numCon.value = false
+        // 不可点时候置1
+        count.value = 1
       }
-    })
+    }
+    // 提供 product 数据给所有子组件使用
+    provide('goods', product)
 
-    // 挂载完成后请求加载数据
-    onMounted(() => {
-      getProduct()
-    })
     return {
-      product
+      product,
+      getGood,
+      count,
+      numCon
     }
   }
 }

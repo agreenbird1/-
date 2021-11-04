@@ -105,16 +105,40 @@ const updateDisabledStatus = (specs, pathMap) => {
     })
   })
 }
+
+/**
+ * 当传值进来初始有值的时候
+ * 应用于购物车组件
+ */
+const getDefaultSelectedValues = (skuId, goods) => {
+  // 1.首先拿到当前的对应 skuId 的sku
+  const target = goods.skus.find(sku => sku.id === skuId).specs
+  // 2.然后根据 sku 里面对应的值去遍历 goods 中的每一个属性
+  goods.specs.forEach((sp, i) => {
+    // 找到对应规格后，去规格中将对应的属性选中
+    // 且这里对应的sku一定是全选的，所以直接进行判断即可
+    sp.values.find(val => val.name === target[i].valueName).selected = true
+  })
+}
 export default {
   name: 'GoodsSku',
   props: {
     goods: {
       type: Object,
       default: () => ({})
+    },
+    // 默认选中的时候传入 skuId
+    skuId: {
+      type: String,
+      default: ''
     }
   },
-  setup (props) {
+  setup (props, { emit }) {
     const pathMap = getEffSkus(props.goods.skus)
+    // 如果有默认选中才调用
+    if (props.skuId) {
+      getDefaultSelectedValues(props.skuId, props.goods)
+    }
     // ★初始化设置
     updateDisabledStatus(props.goods.specs, pathMap)
     // 点击切换选中，且单个可选值属性中只能有一个选中
@@ -130,6 +154,24 @@ export default {
       // 声明赋值
       val.selected = !val.selected
       updateDisabledStatus(props.goods.specs, pathMap)
+      // 每次选中一个属性之后需要将当前 sku 信息进行传递
+      // 获取选中的属性（有效的），判断长度是
+      const selectedValues = getSelectedValues(props.goods.specs).filter(v => v)
+      if (selectedValues.length === props.goods.specs.length) {
+        // 返回的是一个数组
+        const skuIds = pathMap[selectedValues.join(spliter)]
+        const sku = props.goods.skus.find(v => skuIds[0])
+        // reduce 函数用来拼接商品sku信息
+        emit('change', {
+          skuId: sku.id,
+          price: sku.price,
+          oldPrice: sku.oldPrice,
+          inventory: sku.inventory,
+          specsText: sku.specs.reduce((p, c) => (p = p + c.name + ':' + c.valueName + ' '), '')
+        })
+      } else {
+        emit('change', {})
+      }
     }
     return {
       changeSku
