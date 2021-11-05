@@ -1,6 +1,6 @@
 // 扩展vue原有的功能：全局组件，自定义指令，挂载原型方法，注意：没有全局过滤器。
 import defaultImg from '@/assets/images/default.png'
-
+import message from './Message'
 // 正常情况下单个引入组件后，单独注册
 /**
  * import Skeleton from './Skeleton'
@@ -22,6 +22,8 @@ export default {
     })
     // 自定义指令
     defineLazyImg(app)
+    // 挂载消息全局提示
+    app.config.globalProperties.$message = message
   }
 }
 // 自定义指令
