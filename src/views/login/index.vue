@@ -30,6 +30,8 @@
 
 <script>
 import { ref } from 'vue'
+import { useStore } from 'vuex'
+import { useRoute } from 'vue-router'
 import LoginFooter from './components/LoginFooter.vue'
 import LoginHeader from './components/LoginHeader.vue'
 import LoginForm from './components/LoginForm.vue'
@@ -38,6 +40,10 @@ export default {
   components: { LoginFooter, LoginHeader, LoginForm },
   setup () {
     const activeName = ref('account')
+    const store = useStore()
+    const route = useRoute()
+    // 保存来源页，或者首页
+    store.commit('user/setRedirectUrl', route.query.redirectUrl || '/')
     return { activeName }
   }
 }

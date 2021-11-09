@@ -27,7 +27,11 @@
             label="数量"
             :maxValue="product.inventory"
           />
-          <MyButton type="primary" size="middle" style="margin-top: 20px"
+          <MyButton
+            @click="insertCart"
+            type="primary"
+            size="middle"
+            style="margin-top: 20px"
             >加入购物车</MyButton
           >
         </div>
@@ -57,7 +61,9 @@
 <script>
 import { nextTick, provide, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
+import { useStore } from 'vuex'
 import { findProduct } from '@/api/product'
+import message from '@/components/library/Message'
 import GoodsRelevant from './components/GoodsRelevant'
 import GoodsImage from './components/GoodsImage'
 import GoodsSales from './components/GoodsSales.vue'
@@ -110,20 +116,49 @@ export default {
         product.value.price = selectedGood.price
         product.value.oldPrice = selectedGood.oldPrice
         product.value.inventory = selectedGood.inventory
+        // 当前商品
+        currSku.value = selectedGood
       } else {
         numCon.value = false
         // 不可点时候置1
         count.value = 1
+        currSku.value = null
       }
     }
     // 提供 product 数据给所有子组件使用
     provide('goods', product)
 
+    // 标识当前商品
+    const currSku = ref(null)
+    const store = useStore()
+    // 加入购物车
+    const insertCart = () => {
+      if (!currSku.value) {
+        return message({ type: 'warn', text: '请选择商品规格' })
+      }
+      store.dispatch('cart/insertCart', {
+        // 传递约定好的数据
+        id: product.value.id,
+        skuId: currSku.value.skuId,
+        name: product.value.name,
+        picture: product.value.mainPictures[0],
+        price: currSku.value.price,
+        nowPrice: currSku.value.price,
+        count: count.value,
+        attrsText: currSku.value.specsText,
+        selected: true,
+        isEffective: true,
+        stock: currSku.value.inventory
+      }).then(() => {
+        message({ type: 'success', text: '加入购物车成功！' })
+      })
+    }
     return {
       product,
       getGood,
       count,
-      numCon
+      numCon,
+      insertCart
     }
   }
 }

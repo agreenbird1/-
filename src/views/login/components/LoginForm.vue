@@ -28,7 +28,8 @@
               name="account"
               type="text"
               placeholder="请输入用户名"
-            />
+            >
+            </Field>
           </div>
           <!-- 错误信息提示 -->
           <div v-if="errors.account" class="error">
@@ -44,6 +45,7 @@
               name="password"
               type="password"
               placeholder="请输入密码"
+              value="123456"
             /><!-- 错误信息提示 -->
           </div>
           <div v-if="errors.password" class="error">
@@ -79,7 +81,9 @@
               placeholder="请输入验证码"
             />
             <!-- 错误信息提示 -->
-            <span class="code">发送验证码</span>
+            <span @click="sendCode" class="code">
+              {{ timer === 0 ? "发送验证码" : `${timer}秒后发送` }}
+            </span>
           </div>
           <div v-if="errors.code" class="error">
             <i class="iconfont icon-warning" />{{ errors.code }}
@@ -102,10 +106,16 @@
       <a @click="login" href="javascript:;" class="btn">登录</a>
     </Form>
     <div class="action">
-      <img
-        src="https://qzonestyle.gtimg.cn/qzone/vas/opensns/res/img/Connect_logo_7.png"
-        alt=""
-      />
+      <!-- 使用qq的文件创建一个btn -->
+      <a
+        href="https://graph.qq.com/oauth2.0/authorize?client_id=100556005&response_type=token&scope=all&redirect_uri=http%3A%2F%2Fwww.corho.com%3A8080%2F%23%2Flogin%2Fcallback"
+      >
+        <img
+          src="https://qzonestyle.gtimg.cn/qzone/vas/opensns/res/img/Connect_logo_7.png"
+          alt=""
+        />
+      </a>
+      <!-- <span id="qqLoginBtn"></span> -->
       <div class="url">
         <a href="javascript:;">忘记密码</a>
         <a href="javascript:;">免费注册</a>
@@ -115,15 +125,23 @@
 </template>
 
 <script>
-import { ref, reactive, watch, getCurrentInstance } from 'vue'
+import { ref, reactive, watch, getCurrentInstance, onUnmounted } from 'vue'
 import { Field, Form } from 'vee-validate'
+import { useStore } from 'vuex'
+import { useRoute, useRouter } from 'vue-router'
+import { accountLogin, mobileLogin, codeLogin } from '@/api/user'
+// import QC from 'qc'
 import message from '@/components/library/Message.js'
 import schema from '@/utils/vee-validate-schema'
+import { useIntervalFn } from '@vueuse/core'
 export default {
   name: 'LoginForm',
   components: { Form, Field },
   setup () {
     const isMsgLogin = ref(true)
+    const store = useStore()
+    const router = useRouter()
+    const route = useRoute()
     // 存储登录信息
     const form = reactive({
       // 勾选协议
@@ -156,21 +174,78 @@ export default {
     const { proxy } = getCurrentInstance()
 
     const login = async () => {
-      const res = await formCom.value.validate()
-      console.log(message)
-      if (res) {
-        message({ type: 'success', text: '登陆成功！' })
-      } else {
-        // message({ type: 'error', text: '登录信息有误！' })
-        proxy.$message({ type: 'error', text: '登录信息有误！' })
+      const valid = await formCom.value.validate()
+      if (valid) {
+        // 账号登录和验证码登录分离
+        console.log(valid)
+        let data = null
+        if (isMsgLogin.value) {
+          data = await mobileLogin(form.mobile, form.code)
+        } else {
+          const res = await formCom.value.validate()
+          // 表单校验成功后
+          if (res) {
+            data = await accountLogin(form.account, form.password)
+            // 3.成功提示信息
+            message({ type: 'success', text: '登陆成功！' })
+          } else {
+            // message({ type: 'error', text: '登录信息有误！' })
+            proxy.$message({ type: 'error', text: '登录信息有误！' })
+          }
+        }
+        // 1.存储用户信息
+        const { id, account, avatar, mobile, nickname, token } = data.result
+        store.commit('user/setUser', { id, account, avatar, mobile, nickname, token })
+        // 2.返回来时的页面 或者 首页
+        router.push(route.query.redirectUrl || '/')
       }
     }
+
+    const timer = ref(0)
+    // 回调 间隔 是否立即开启
+    const { pause, resume } = useIntervalFn(() => {
+      timer.value--
+      if (timer.value <= 0) {
+        pause()
+      }
+    }, 1000, { immediate: false })
+    onUnmounted(() => {
+      pause()
+    })
+    const sendCode = async () => {
+      // 手动验证手机号格式
+      const valid = mySchema.mobile(form.mobile)
+      if (valid === true) {
+        // 验证成功且需要间隔60秒
+        if (timer.value <= 0) {
+          await codeLogin(form.mobile)
+          message({ type: 'success', text: '发送成功！' })
+          // 成功之后开启定时器
+          timer.value = 60
+          resume()
+        }
+      } else {
+        // 不为真时候valid就是错误信息
+        formCom.value.setFieldError('mobile', valid)
+      }
+    }
+
+    // QC的目的主要是得到跳的地址
+    // onMounted(() => {
+    //   // 组件渲染完毕，使用QC生成QQ登录按钮
+    //   QC.Login({
+    //     btnId: 'qqLoginBtn'
+    //   })
+    // })
+
     return {
       isMsgLogin,
       form,
       mySchema,
       formCom,
-      login
+      login,
+      sendCode,
+      timer
     }
   }
 }

@@ -1,5 +1,5 @@
 <template>
-  <div class="xtx-checkbox" @click="checked = !checked">
+  <div class="xtx-checkbox" @click="changeC">
     <i v-if="checked" class="iconfont icon-checked"></i>
     <i v-else class="iconfont icon-unchecked"></i>
     <!-- slot 插槽获取传递的文字内容 -->
@@ -23,7 +23,12 @@ export default {
     // 这个复选框是通过两个图标的显示切换进行控制
     // useVModel 三个参数
     const checked = useVModel(props, 'modelValue', emit)
-    return { checked }
+    const changeC = () => {
+      const newVal = !checked.value
+      checked.value = newVal
+      emit('change', newVal)
+    }
+    return { checked, changeC }
   }
 }
 </script>

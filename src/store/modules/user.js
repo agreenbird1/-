@@ -15,12 +15,16 @@ export default {
         mobile: '',
         // 用户信息标识
         token: ''
-      }
+      },
+      redirectUrl: ''
     }
   },
   mutations: {
     setUser (state, newUser) {
-      state.user = { ...state.user, ...newUser }
+      state.user = newUser
+    },
+    setRedirectUrl (state, newUrl) {
+      state.user.redirectUrl = newUrl
     }
   }
 }

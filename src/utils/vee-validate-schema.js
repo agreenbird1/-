@@ -1,12 +1,27 @@
+import { userAccountCheck } from '@/api/user'
 // 定义为vee-validate使用的校验规则
 export default {
   account (value) {
     if (!value) return '用户名不能为空'
     return true
   },
+  async accountApi (value) {
+    // 格式校验
+    if (!value) return '用户名不能为空'
+    const data = await userAccountCheck(value)
+    // 服务器、数据库校验
+    if (data.result.valid) return '用户名已存在'
+    return true
+  },
   password (value) {
     if (!value) return '请输入密码'
     if (!/^\w{6,24}$/.test(value)) return '密码是6-24个字符'
+    return true
+  },
+  rePassword (value, { form }) {
+    if (!value) return '请输入密码'
+    if (!/^\w{6,24}$/.test(value)) return '密码是6-24个字符'
+    if (value !== form.password) return '密码输入不一致'
     return true
   },
   mobile (value) {

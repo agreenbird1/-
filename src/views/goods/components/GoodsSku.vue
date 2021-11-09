@@ -160,7 +160,7 @@ export default {
       if (selectedValues.length === props.goods.specs.length) {
         // 返回的是一个数组
         const skuIds = pathMap[selectedValues.join(spliter)]
-        const sku = props.goods.skus.find(v => skuIds[0])
+        const sku = props.goods.skus.find(v => v.id === skuIds[0])
         // reduce 函数用来拼接商品sku信息
         emit('change', {
           skuId: sku.id,

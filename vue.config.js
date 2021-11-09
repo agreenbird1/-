@@ -18,6 +18,19 @@ module.exports = {
         include: /node_modules/,
         type: 'javascript/auto'
       }]
+    },
+    // 忽略import关于qc的引入文件资源的打包
+    externals: {
+      qc: 'QC'
     }
+  },
+  chainWebpack: config => {
+    config.module
+      .rule('images')
+      .use('url-loader')
+      .loader('url-loader')
+      .tap(options => Object.assign(options, { limit: 10000 }))
+    // 开启ip访问地址权限
+    config.devServer.disableHostCheck(true)
   }
 }
