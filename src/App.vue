@@ -5,13 +5,6 @@
 
 <script>
 export default {
-  name: 'App',
-  setup () {
-    return {
-    }
-  }
+  name: 'App'
 }
 </script>
-
-<style lang="less">
-</style>

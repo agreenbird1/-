@@ -156,8 +156,11 @@ export default {
         userQQPatchLogin(props.unionId, form.mobile, form.code, form.account, form.password).then(data => {
           const { id, account, avatar, mobile, nickname, token } = data.result
           store.commit('user/setUser', { id, account, avatar, mobile, nickname, token })
-          // 2.返回来时的页面 或者 首页
-          router.push(store.state.user.redirectUrl)
+          // 登陆成功后先合并购物车
+          store.dispatch('cart/mergeCart').then(() => {
+            // 2.返回来时的页面 或者 首页
+            router.push(store.state.user.redirectUrl)
+          })
         }).catch(e => {
           console.dir(e)
           message({ type: 'error', text: e.response.data.message })

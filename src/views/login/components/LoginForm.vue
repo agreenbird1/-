@@ -177,7 +177,6 @@ export default {
       const valid = await formCom.value.validate()
       if (valid) {
         // 账号登录和验证码登录分离
-        console.log(valid)
         let data = null
         if (isMsgLogin.value) {
           data = await mobileLogin(form.mobile, form.code)
@@ -196,8 +195,13 @@ export default {
         // 1.存储用户信息
         const { id, account, avatar, mobile, nickname, token } = data.result
         store.commit('user/setUser', { id, account, avatar, mobile, nickname, token })
-        // 2.返回来时的页面 或者 首页
-        router.push(route.query.redirectUrl || '/')
+        // 登陆成功后先合并购物车
+        store.dispatch('cart/mergeCart').then(() => {
+          // 更新购物车信息
+          store.dispatch('cart/updateCart', {})
+          // 2.返回来时的页面 或者 首页
+          router.push(route.query.redirectUrl || '/')
+        })
       }
     }
 

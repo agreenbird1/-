@@ -25,7 +25,7 @@
           </thead>
           <!-- 有效商品 -->
           <tbody>
-            <tr>
+            <tr v-if="!$store.getters['cart/validList'].length">
               <td colspan="6">
                 <CartNone />
               </td>
@@ -50,6 +50,11 @@
                       {{ goods.name }}
                     </p>
                     <!-- 选择规格组件 -->
+                    <CartSku
+                      @change="($event) => updateCartSku(goods.skuId, $event)"
+                      :skuId="goods.skuId"
+                      :attrsText="goods.attrsText"
+                    />
                   </div>
                 </div>
               </td>
@@ -63,7 +68,15 @@
                 </p>
               </td>
               <td class="tc">
-                <Numbox :modelValue="goods.count" />
+                <!-- :modelValue="goods.count"
+                     @update:modelValue="goods.count = $event"
+                -->
+                <Numbox
+                  :maxValue="goods.stock"
+                  :numCon="true"
+                  v-model="goods.count"
+                  @change="($event) => updateCount(goods.skuId, $event)"
+                />
               </td>
               <td class="tc">
                 <p class="f16 red">
@@ -133,9 +146,14 @@
           <CheckBox :modelValue="$store.getters['cart/isCheckAll']"
             >全选</CheckBox
           >
-          <a href="javascript:;">删除商品</a>
+          <a href="javascript:;" @click="batchCart">删除商品</a>
           <a href="javascript:;">移入收藏夹</a>
-          <a href="javascript:;">清空失效商品</a>
+          <a
+            href="javascript:;"
+            v-if="$store.getters['cart/invalidList'].length"
+            @click="batchInCart"
+            >清空失效商品</a
+          >
         </div>
         <div class="total">
           共 {{ $store.getters["cart/validTotal"] }} 件商品，已选择
@@ -151,26 +169,77 @@
 </template>
 <script>
 import { useStore } from 'vuex'
+import confirm from '@/components/library/Confirm'
+import message from '@/components/library/Message'
 import GoodRelevant from '@/views/goods/components/GoodsRelevant.vue'
 import CartNone from './components/CartNone.vue'
+import CartSku from './components/CartSku.vue'
 export default {
   name: 'XtxCartPage',
-  components: { GoodRelevant, CartNone },
+  components: { GoodRelevant, CartNone, CartSku },
   setup () {
     const store = useStore()
+    // 选中一个
     const checkOne = (skuId, selected) => {
       store.dispatch('cart/updateCart', { skuId, selected })
     }
+    // 全选
     const selectedAll = (newVal) => {
       store.dispatch('cart/selectedAll', newVal)
     }
+    // 单个删除
     const deleteGoodsInCart = (skuId) => {
-      store.dispatch('cart/deleteGoods', skuId)
+      // 点击确定是触发 resolve ，取消和x是触发 reject
+      confirm({ text: '您确定删除该商品吗？' }).then(() => {
+        store.dispatch('cart/deleteGoods', skuId)
+        message({ type: 'success', text: '删除成功' })
+      }).catch(() => {
+        message({ text: '已取消' })
+      })
+    }
+
+    // 批量删除选中
+    const batchCart = () => {
+      if (store.getters['cart/selectedList'].length) {
+        // 点击确定是触发 resolve ，取消和x是触发 reject
+        confirm({ text: '您确定删除选中的商品吗？' }).then(() => {
+          store.dispatch('cart/batchCart')
+          message({ type: 'success', text: '删除成功' })
+        }).catch(() => {
+          message({ text: '已取消' })
+        })
+      } else {
+        message({ type: 'warn', text: '您未选中任何商品！' })
+      }
+    }
+
+    // 清空无效
+    const batchInCart = () => {
+      // 点击确定是触发 resolve ，取消和x是触发 reject
+      confirm({ text: '您确定清空无效商品吗？' }).then(() => {
+        store.dispatch('cart/batchInCart')
+        message({ type: 'success', text: '清空成功' })
+      }).catch(() => {
+        message({ text: '已取消' })
+      })
+    }
+    // 更新数量
+    const updateCount = (skuId, count) => {
+      store.dispatch('cart/updateCart', { skuId, count })
+    }
+
+    // 更新 sku 信息
+    const updateCartSku = (oldSkuId, newSku) => {
+      store.dispatch('cart/updateCartSku', { oldSkuId, newSku })
     }
     return {
       checkOne,
       selectedAll,
-      deleteGoodsInCart
+      deleteGoodsInCart,
+      batchCart,
+      batchInCart,
+      updateCount,
+      updateCartSku
     }
   }
 }

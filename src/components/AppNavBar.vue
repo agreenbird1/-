@@ -36,7 +36,9 @@ export default {
     const router = useRouter()
     const { user } = store.state.user
     const logout = () => {
+      // 清除用户数据，清空购物车
       store.commit('user/setUser', {})
+      store.commit('cart/setCartList', [])
       router.push('/login')
     }
     return { user, logout }

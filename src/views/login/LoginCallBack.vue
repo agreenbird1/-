@@ -69,9 +69,12 @@ export default {
           // 2.返回来时页或者首页
           const { id, account, avatar, mobile, nickname, token } = data.result
           store.commit('user/setUser', { id, account, avatar, mobile, nickname, token })
-          // 但是从qq返回的，不会有来源页，所以在login的时候就将其存储在vuex中
-          router.push(store.state.user.redirectUrl)
-          message({ type: 'success', text: '登陆成功！' })
+          // 登陆成功后先合并购物车
+          store.dispatch('cart/mergeCart').then(() => {
+            // 但是从qq返回的，不会有来源页，所以在login的时候就将其存储在vuex中
+            router.push(store.state.user.redirectUrl)
+            message({ type: 'success', text: '登陆成功！' })
+          })
         }).catch(e => {
           // 有错就代表不行，进行两种绑定
           isBind.value = false
