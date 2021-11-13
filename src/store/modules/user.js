@@ -22,7 +22,6 @@ export default {
   mutations: {
     setUser (state, newUser) {
       state.user = newUser
-      console.log(state.user.token)
     },
     setRedirectUrl (state, newUrl) {
       state.user.redirectUrl = newUrl

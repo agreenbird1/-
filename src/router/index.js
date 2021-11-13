@@ -1,3 +1,4 @@
+import store from '@/store'
 import { createRouter, createWebHashHistory } from 'vue-router'
 
 const Layout = () => import('@/views/Layout')
@@ -9,6 +10,10 @@ const Cart = () => import('@/views/cart/')
 
 const Login = () => import('@/views/login/')
 const LoginCallBack = () => import('@/views/login/LoginCallBack')
+
+const Checkout = () => import('@/views/member/pay/Checkout')
+const Pay = () => import('@/views/member/pay/')
+const PayResult = () => import('@/views/member/pay/PayResult')
 
 const routes = [
   {
@@ -35,6 +40,15 @@ const routes = [
       {
         path: '/cart',
         component: Cart
+      }, {
+        path: '/member/checkout',
+        component: Checkout
+      }, {
+        path: '/member/pay',
+        component: Pay
+      }, {
+        path: '/pay/callback',
+        component: PayResult
       }
     ]
   },
@@ -55,6 +69,18 @@ const router = createRouter({
   scrollBehavior () {
     return { left: 0, top: 0 }
   }
+})
+
+router.beforeEach((to, from, next) => {
+  // 先进行登录状态验证
+  const { user } = store.state.user
+  if (!user.token && to.path.startsWith('/member')) {
+    // 未登录状态
+    // 跳转到登录页且携带当前被拦截的地址方便回跳
+    next({ path: '/login', query: { redirectUrl: to.fullPath } })
+  }
+  // 否则直接放行
+  next()
 })
 
 export default router
