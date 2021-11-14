@@ -6,7 +6,9 @@
         用两个 template 隔开-->
         <template v-if="user.token">
           <li>
-            <a href="javascript:;"><i class="iconfont icon-user"></i>周杰伦</a>
+            <RouterLink to="/member"
+              ><i class="iconfont icon-user"></i>{{ user.account }}</RouterLink
+            >
           </li>
           <li><a href="javascript:;" @click="logout">退出登录</a></li>
         </template>

@@ -1,4 +1,5 @@
 import store from '@/store'
+import { h } from 'vue'
 import { createRouter, createWebHashHistory } from 'vue-router'
 
 const Layout = () => import('@/views/Layout')
@@ -14,6 +15,11 @@ const LoginCallBack = () => import('@/views/login/LoginCallBack')
 const Checkout = () => import('@/views/member/pay/Checkout')
 const Pay = () => import('@/views/member/pay/')
 const PayResult = () => import('@/views/member/pay/PayResult')
+
+const MemberLayout = () => import('@/views/member/Layout')
+const MemberHome = () => import('@/views/member/home')
+const MemberOrder = () => import('@/views/member/order')
+const MemberOrderDetail = () => import('@/views/member/order/Detail')
 
 const routes = [
   {
@@ -49,6 +55,27 @@ const routes = [
       }, {
         path: '/pay/callback',
         component: PayResult
+      }, {
+        path: '/member',
+        component: MemberLayout,
+        children: [
+          {
+            path: '/member',
+            component: MemberHome
+          },
+          {
+            // 实现模糊匹配这里需要继续嵌套路由，所以用render函数渲染一个组件当作父组件
+            path: '/member/order',
+            component: { render: () => h(<RouterView />) },
+            children: [{
+              path: '',
+              component: MemberOrder
+            }, {
+              path: ':id',
+              component: MemberOrderDetail
+            }]
+          }
+        ]
       }
     ]
   },
