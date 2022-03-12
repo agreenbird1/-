@@ -37,9 +37,9 @@ export default {
         const newVal = props.modelValue + val
 
         if (newVal <= props.maxValue && newVal >= 1) {
+          console.log(newVal)
           // 实现双向数据绑定
           emit('update:modelValue', newVal)
-          console.log(props.modelValue)
         }
       }
     }

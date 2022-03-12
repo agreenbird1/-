@@ -71,16 +71,23 @@ export default {
     const getSubCategories = () => {
       findTopCategories(route.params.id).then(data => {
         subCategory.value = data.result.children
+        console.log(data)
       })
     }
 
     // 进入时候就需要进行监听，是从无到有的监听
-    watch(() => route.params.id, (newVal) => {
-      // newVal && getSubCategories() // 一级类目到二级类目也会发生请求
-      // console.log(topCategory.find((elem) => elem.id === route.params.id))
-      // 新 id 存在 且存在于顶级类目中才发送请求
-      newVal && store.state.category.list.find((elem) => elem.id === newVal) && getSubCategories()
-    }, { immediate: true })
+    watch(
+      () => route.params.id,
+      newVal => {
+        // newVal && getSubCategories() // 一级类目到二级类目也会发生请求
+        // console.log(topCategory.find((elem) => elem.id === route.params.id))
+        // 新 id 存在 且存在于顶级类目中才发送请求
+        newVal &&
+          store.state.category.list.find(elem => elem.id === newVal) &&
+          getSubCategories()
+      },
+      { immediate: true }
+    )
     return {
       sliders,
       category,
@@ -90,7 +97,7 @@ export default {
 }
 </script>
 
-<style scoped lang='less'>
+<style scoped lang="less">
 .top-category {
   h3 {
     font-size: 28px;

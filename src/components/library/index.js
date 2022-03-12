@@ -9,7 +9,7 @@ import message from './Message'
 
 // 使用全局注册方法，免得每次进行导入
 
-// 1. 被加载目录  2. 是否加载子目录  3. 加载文件的正则  返沪的函数用来进行导入
+// 1. 被加载目录  2. 是否加载子目录  3. 加载文件的正则  返回的函数用来进行导入
 const importFn = require.context('./', false, /\.vue$/)
 
 export default {
@@ -28,7 +28,7 @@ export default {
 }
 // 自定义指令
 // 尽管拒绝手动操作 dom ，但是需要自己添加
-const defineLazyImg = (app) => {
+const defineLazyImg = app => {
   // 取名叫做 lazy ，使用时需要写作 v-lazy
   app.directive('lazy', {
     // 指令自定义对象 mounted
@@ -37,24 +37,29 @@ const defineLazyImg = (app) => {
     mounted (el, binding) {
       // 懒加载，新建一个观察
       /*
-       *        * IntersectionObserverEntry.isIntersecting (en-US) 只读
+       * IntersectionObserverEntry.isIntersecting (en-US) 只读
        * 返回一个布尔值, 如果目标元素与交叉区域观察者对象(intersection observer) 的根相交，则返回 true .
        * 如果返回 true, 则 IntersectionObserverEntry 描述了变换到交叉时的状态;
        * 如果返回 false, 那么可以由此判断,变换是从交叉状态到非交叉状态.
        */
-      const observe = new IntersectionObserver(([{ isIntersecting }]) => {
-        if (isIntersecting) {
-          // 进入可视区关闭观察
-          observe.unobserve(el)
-          // 还有图片加载失败的情况
-          el.error = () => {
-            el.src = defaultImg
+      const observe = new IntersectionObserver(
+        // isIntersecting：Boolean
+        // 观察是否与根元素相交，视口相交。
+        ([{ isIntersecting }]) => {
+          if (isIntersecting) {
+            // 进入可视区关闭观察
+            observe.unobserve(el)
+            // 还有图片加载失败的情况
+            el.error = () => {
+              el.src = defaultImg
+            }
+            el.src = binding.value
           }
-          el.src = binding.value
+        },
+        {
+          threshold: 0
         }
-      }, {
-        threshold: 0
-      })
+      )
       observe.observe(el)
     }
   })

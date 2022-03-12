@@ -162,7 +162,6 @@ export default {
             router.push(store.state.user.redirectUrl)
           })
         }).catch(e => {
-          console.dir(e)
           message({ type: 'error', text: e.response.data.message })
         })
       }

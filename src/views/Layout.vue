@@ -13,6 +13,7 @@
 
 <script>
 import { useStore } from 'vuex'
+
 import AppNavBar from '@/components/AppNavBar.vue'
 import AppHeader from '@/components/AppHeader.vue'
 import AppFooter from '@/components/AppFooter.vue'
@@ -24,6 +25,7 @@ export default {
     // 加载时获取数据
     const store = useStore()
     store.dispatch('category/getList')
+    store.dispatch('cart/getCartList')
   }
 }
 </script>

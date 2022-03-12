@@ -143,7 +143,6 @@ export default {
     watch(reqParams, () => {
       findGoodsCommentsList(route.params.id, reqParams).then(data => {
         commentsList.value = data.result
-        console.log(commentsList.value)
       })
     }, { immediate: true })
     return {

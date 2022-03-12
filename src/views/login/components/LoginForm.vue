@@ -125,7 +125,7 @@
 </template>
 
 <script>
-import { ref, reactive, watch, getCurrentInstance, onUnmounted } from 'vue'
+import { ref, reactive, watch, onUnmounted } from 'vue'
 import { Field, Form } from 'vee-validate'
 import { useStore } from 'vuex'
 import { useRoute, useRouter } from 'vue-router'
@@ -170,9 +170,6 @@ export default {
       form.code = null
     })
 
-    // getCurrentInstance 是获取整个app实例，proxy是获取当前组件实例
-    const { proxy } = getCurrentInstance()
-
     const login = async () => {
       const valid = await formCom.value.validate()
       if (valid) {
@@ -184,24 +181,27 @@ export default {
           const res = await formCom.value.validate()
           // 表单校验成功后
           if (res) {
-            data = await accountLogin(form.account, form.password)
-            // 3.成功提示信息
-            message({ type: 'success', text: '登陆成功！' })
-          } else {
-            // message({ type: 'error', text: '登录信息有误！' })
-            proxy.$message({ type: 'error', text: '登录信息有误！' })
+            accountLogin(form.account, form.password).then(res => {
+              data = res
+              console.log(res)
+              message({ type: 'success', text: '登陆成功！' })
+              // 1.存储用户信息
+              const { id, account, avatar, mobile, nickname, token } = data.result
+              store.commit('user/setUser', { id, account, avatar, mobile, nickname, token })
+              // 登陆成功后先合并购物车
+              store.dispatch('cart/mergeCart').then(() => {
+                // 更新购物车信息
+                store.dispatch('cart/updateCart', {})
+                // 2.返回来时的页面 或者 首页
+                router.push(route.query.redirectUrl || '/')
+              })
+            }, err => {
+              console.dir(err)
+              data = err.response.data
+              message({ type: 'error', text: data.message })
+            })
           }
         }
-        // 1.存储用户信息
-        const { id, account, avatar, mobile, nickname, token } = data.result
-        store.commit('user/setUser', { id, account, avatar, mobile, nickname, token })
-        // 登陆成功后先合并购物车
-        store.dispatch('cart/mergeCart').then(() => {
-          // 更新购物车信息
-          store.dispatch('cart/updateCart', {})
-          // 2.返回来时的页面 或者 首页
-          router.push(route.query.redirectUrl || '/')
-        })
       }
     }
 
@@ -233,14 +233,6 @@ export default {
         formCom.value.setFieldError('mobile', valid)
       }
     }
-
-    // QC的目的主要是得到跳的地址
-    // onMounted(() => {
-    //   // 组件渲染完毕，使用QC生成QQ登录按钮
-    //   QC.Login({
-    //     btnId: 'qqLoginBtn'
-    //   })
-    // })
 
     return {
       isMsgLogin,

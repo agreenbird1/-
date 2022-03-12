@@ -143,7 +143,9 @@
       <!-- 操作栏 -->
       <div class="action">
         <div class="batch">
-          <CheckBox :modelValue="$store.getters['cart/isCheckAll']"
+          <CheckBox
+            @change="selectedAll"
+            :modelValue="$store.getters['cart/isCheckAll']"
             >全选</CheckBox
           >
           <a href="javascript:;" @click="batchCart">删除商品</a>
@@ -185,30 +187,35 @@ export default {
       store.dispatch('cart/updateCart', { skuId, selected })
     }
     // 全选
-    const selectedAll = (newVal) => {
+    const selectedAll = newVal => {
+      console.log(newVal)
       store.dispatch('cart/selectedAll', newVal)
     }
     // 单个删除
-    const deleteGoodsInCart = (skuId) => {
+    const deleteGoodsInCart = skuId => {
       // 点击确定是触发 resolve ，取消和x是触发 reject
-      confirm({ text: '您确定删除该商品吗？' }).then(() => {
-        store.dispatch('cart/deleteGoods', skuId)
-        message({ type: 'success', text: '删除成功' })
-      }).catch(() => {
-        message({ text: '已取消' })
-      })
+      confirm({ text: '您确定删除该商品吗？' })
+        .then(() => {
+          store.dispatch('cart/deleteGoods', skuId)
+          message({ type: 'success', text: '删除成功' })
+        })
+        .catch(() => {
+          message({ text: '已取消' })
+        })
     }
 
     // 批量删除选中
     const batchCart = () => {
       if (store.getters['cart/selectedList'].length) {
         // 点击确定是触发 resolve ，取消和x是触发 reject
-        confirm({ text: '您确定删除选中的商品吗？' }).then(() => {
-          store.dispatch('cart/batchCart')
-          message({ type: 'success', text: '删除成功' })
-        }).catch(() => {
-          message({ text: '已取消' })
-        })
+        confirm({ text: '您确定删除选中的商品吗？' })
+          .then(() => {
+            store.dispatch('cart/batchCart')
+            message({ type: 'success', text: '删除成功' })
+          })
+          .catch(() => {
+            message({ text: '已取消' })
+          })
       } else {
         message({ type: 'warn', text: '您未选中任何商品！' })
       }
@@ -217,12 +224,14 @@ export default {
     // 清空无效
     const batchInCart = () => {
       // 点击确定是触发 resolve ，取消和x是触发 reject
-      confirm({ text: '您确定清空无效商品吗？' }).then(() => {
-        store.dispatch('cart/batchInCart')
-        message({ type: 'success', text: '清空成功' })
-      }).catch(() => {
-        message({ text: '已取消' })
-      })
+      confirm({ text: '您确定清空无效商品吗？' })
+        .then(() => {
+          store.dispatch('cart/batchInCart')
+          message({ type: 'success', text: '清空成功' })
+        })
+        .catch(() => {
+          message({ text: '已取消' })
+        })
     }
     // 更新数量
     const updateCount = (skuId, count) => {
@@ -237,12 +246,16 @@ export default {
     const router = useRouter()
     // 下单结算页面
     const checkOut = () => {
-      if (store.getters['cart/selectedList'].length === 0) { return message({ type: 'warn', text: '请至少选中一件商品' }) }
+      if (store.getters['cart/selectedList'].length === 0) {
+        return message({ type: 'warn', text: '请至少选中一件商品' })
+      }
       // 未登录时候
       if (!store.state.user.user.token) {
-        confirm({ text: '结算购物车需要先进行登录，您确定登录吗？' }).then(() => {
-          router.push('/member/checkout')
-        }).catch(e => { })
+        confirm({ text: '结算购物车需要先进行登录，您确定登录吗？' })
+          .then(() => {
+            router.push('/member/checkout')
+          })
+          .catch(e => { })
       } else router.push('/member/checkout')
     }
     return {

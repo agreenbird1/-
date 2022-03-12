@@ -72,7 +72,6 @@ export default {
       if (currSku && currSku.skuId && currSku.skuId !== props.skuId) {
         emit('change', currSku)
       } else {
-        console.log(currSku)
         message({ type: 'warn', text: '不是有效的规格！' })
       }
       close()

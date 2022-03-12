@@ -135,6 +135,8 @@ export default {
   },
   setup (props, { emit }) {
     const pathMap = getEffSkus(props.goods.skus)
+    console.log(props.goods.skus)
+    console.log(pathMap)
     // 如果有默认选中才调用
     if (props.skuId) {
       getDefaultSelectedValues(props.skuId, props.goods)

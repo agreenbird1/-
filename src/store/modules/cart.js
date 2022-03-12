@@ -1,4 +1,4 @@
-import { deleteCart, findCart, insertCart, mergeCart, updateCart } from '@/api/cart'
+import { checkAllCart, deleteCart, findCart, insertCart, mergeCart, updateCart } from '@/api/cart'
 
 // 购物车模块
 export default {
@@ -18,8 +18,6 @@ export default {
       // 是通过skuId确定唯一商品
       state.list.forEach(goods => {
         if (goods.skuId === newGoods.skuId) {
-          console.log('goods' + goods.skuId)
-          console.log(newGoods)
           // 同一商品添加数量即可
           goods.count = goods.count + newGoods.count
           isOldGoods = true
@@ -197,16 +195,28 @@ export default {
       })
     },
     // 全选操作
-    selectedAll (ctx, newSelected) {
+    selectedAll (ctx, selected) {
       // goods 中：必须有skuId，其他想修改的属性 selected  count
       return new Promise((resolve, reject) => {
         if (ctx.rootState.user.user.token) {
           // 登录 TODO
+          const ids = ctx.getters.validList.map(item => item.skuId)
+          checkAllCart({ selected, ids }).then(() => {
+            return findCart()
+          }).then((data) => {
+            ctx.commit('setCartList', data.result)
+            resolve()
+          })
         } else {
           // 本地
-          ctx.commit('selectedLocalAll', { newSelected, newList: ctx.getters.validList })
+          ctx.commit('selectedLocalAll', { selected, newList: ctx.getters.validList })
           resolve()
         }
+      })
+    },
+    getCartList ({ commit }) {
+      findCart().then(res => {
+        commit('setCartList', res.result)
       })
     }
   },

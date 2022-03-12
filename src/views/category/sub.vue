@@ -75,7 +75,6 @@ export default {
           pageSize: 20,
           categoryId: route.params.id
         }
-        console.log('new' + params.categoryId)
         // 清空当前goodslist
         goodsList.value = []
       }
@@ -88,8 +87,6 @@ export default {
       params = { ...params, ...sortParams, page: 1 }
       // 重置数据列表
       goodsList.value = []
-      console.log(params)
-      console.log(loading.value, finished.value)
     }
 
     // 属性列表改变后也需要

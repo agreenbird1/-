@@ -64,7 +64,6 @@ export default {
       QC.Login.getMe(openId => {
         qqLogin(openId).then(data => {
           unionId = openId
-          console.log(unionId)
           // 1.存储用户信息
           // 2.返回来时页或者首页
           const { id, account, avatar, mobile, nickname, token } = data.result

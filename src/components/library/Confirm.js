@@ -19,8 +19,10 @@ export default ({ title, text }) => {
       render(null, dom)
       resolve()
     }
-    // 将函数以 props 的形式传入，在点击确认或者取消的时候进行回调
+    // 第一参数为容器，可以为'div'，或者函数式组件
+    // 第二参数以 props 的形式传入，在点击确认或者取消的时候进行回调
     const vnode = createVNode(Confirm, { title, text, pconfirm, pcancel })
+    // 渲染
     render(vnode, dom)
   })
 }
