@@ -24,7 +24,7 @@ export default {
       state.user = newUser
     },
     setRedirectUrl (state, newUrl) {
-      state.user.redirectUrl = newUrl
+      state.redirectUrl = newUrl
     }
   }
 }

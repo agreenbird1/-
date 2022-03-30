@@ -19,7 +19,7 @@ let timer = null
 export default ({ type, text }) => {
   const vnode = createVNode(Message, { type, text })
   render(vnode, dom)
-
+  // 只有单个
   clearTimeout(timer)
   timer = setTimeout(() => {
     // 将空值赋值删除之前的

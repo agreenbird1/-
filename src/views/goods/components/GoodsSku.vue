@@ -16,8 +16,9 @@
             v-else
             @click="changeSku(item, val)"
             :class="{ selected: val.selected, disabled: val.disabled }"
-            >{{ val.name }}</span
           >
+            {{ val.name }}
+          </span>
         </template>
       </dd>
     </dl>
@@ -135,8 +136,6 @@ export default {
   },
   setup (props, { emit }) {
     const pathMap = getEffSkus(props.goods.skus)
-    console.log(props.goods.skus)
-    console.log(pathMap)
     // 如果有默认选中才调用
     if (props.skuId) {
       getDefaultSelectedValues(props.skuId, props.goods)

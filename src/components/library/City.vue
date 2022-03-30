@@ -37,6 +37,7 @@ export default {
     }
   },
   setup (props, { emit }) {
+    // 信息有三级，根据三级code的不同重新渲染
     // 1.点击需要关闭，默认也是关闭
     const visible = ref(false)
     // 加载中

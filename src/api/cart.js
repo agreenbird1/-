@@ -5,7 +5,7 @@ import request from '@/utils/request'
  * @param {String} skuId - 商品SKUID
  * @returns Promise
  */
-export const getSpecsAndSkus = (skuId) => {
+export const getSpecsAndSkus = skuId => {
   return request(`/goods/sku/${skuId}`, 'get')
 }
 
@@ -14,7 +14,8 @@ export const getSpecsAndSkus = (skuId) => {
  * @param {Array<Object>} cartList
  * @returns 合并成功的信息
  */
-export const mergeCart = (cartList) => {
+export const mergeCart = cartList => {
+  console.log(cartList)
   return request('/member/cart/merge', 'POST', cartList)
 }
 
@@ -41,7 +42,7 @@ export const insertCart = ({ skuId, count }) => {
  * @param {Array<string>} ids - skuId集合
  * @returns Promise
  */
-export const deleteCart = (ids) => {
+export const deleteCart = ids => {
   return request('/member/cart', 'delete', { ids })
 }
 
@@ -52,7 +53,7 @@ export const deleteCart = (ids) => {
  * @param {Integer} goods.count - 商品数量
  * @returns Promise
  */
-export const updateCart = (goods) => {
+export const updateCart = goods => {
   return request('/member/cart/' + goods.skuId, 'put', goods)
 }
 

@@ -177,13 +177,27 @@ export default {
         let data = null
         if (isMsgLogin.value) {
           data = await mobileLogin(form.mobile, form.code)
+          if (data.code === '1') {
+            message({ type: 'success', text: '登陆成功！' })
+            // 1.存储用户信息
+            const { id, account, avatar, mobile, nickname, token } = data.result
+            store.commit('user/setUser', { id, account, avatar, mobile, nickname, token })
+            // 登陆成功后先合并购物车
+            store.dispatch('cart/mergeCart').then(() => {
+              // 更新购物车信息
+              store.dispatch('cart/updateCart', {})
+              // 2.返回来时的页面 或者 首页
+              router.push(route.query.redirectUrl || '/')
+            })
+          } else {
+            message({ type: 'error', text: data.message })
+          }
         } else {
           const res = await formCom.value.validate()
           // 表单校验成功后
           if (res) {
             accountLogin(form.account, form.password).then(res => {
               data = res
-              console.log(res)
               message({ type: 'success', text: '登陆成功！' })
               // 1.存储用户信息
               const { id, account, avatar, mobile, nickname, token } = data.result
@@ -222,11 +236,15 @@ export default {
       if (valid === true) {
         // 验证成功且需要间隔60秒
         if (timer.value <= 0) {
-          await codeLogin(form.mobile)
-          message({ type: 'success', text: '发送成功！' })
-          // 成功之后开启定时器
-          timer.value = 60
-          resume()
+          try {
+            await codeLogin(form.mobile)
+            message({ type: 'success', text: '发送成功！' })
+            // 成功之后开启定时器
+            timer.value = 60
+            resume()
+          } catch (e) {
+            message({ type: 'error', text: '用户不存在！' })
+          }
         }
       } else {
         // 不为真时候valid就是错误信息

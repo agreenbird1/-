@@ -89,6 +89,7 @@ export default {
       }
     }
     const checkChange = () => {
+      console.log(sortParams)
       // 每次改变需要重新发送请求
       emit('sort-change', sortParams)
     }

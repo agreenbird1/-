@@ -40,6 +40,7 @@ export default {
     const logout = () => {
       // 清除用户数据，清空购物车
       store.commit('user/setUser', {})
+      store.commit('user/setRedirectUrl', '')
       store.commit('cart/setCartList', [])
       router.push('/login')
     }

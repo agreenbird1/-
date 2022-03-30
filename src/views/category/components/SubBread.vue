@@ -1,10 +1,12 @@
 <template>
   <Bread>
     <BreadItem to="/">首页</BreadItem>
-    <BreadItem v-if="category.top" :to="`/category/${category.top.id}`">{{
-      category.top.name
+    <BreadItem v-if="category.top" :to="`/category/${category.top.id}`"
+      >{{ category.top.name }}
+    </BreadItem>
+    <BreadItem v-if="category.sub" :to="`/category/${category.sub.id}`">{{
+      category.sub.name
     }}</BreadItem>
-    <BreadItem to="/" v-if="category.sub">{{ category.sub.name }}</BreadItem>
   </Bread>
 </template>
 <script>
@@ -23,19 +25,19 @@ export default {
     // 此处 消磨 太久，因为之前路由时候 id 值传错导致！
 
     const category = computed(() => {
-      const cate = {}
+      const obj = {}
       store.state.category.list.forEach(top => {
-        if (top.children) {
-          const sub = top.children.find(sub => {
-            return sub.id === route.params.id
-          })
-          if (sub) {
-            cate.top = { id: top.id, name: top.name }
-            cate.sub = { id: sub.id, name: sub.name }
+        console.log(top)
+        top.children && top.children.forEach(sub => {
+          if (sub.id === route.params.id) {
+            // 设置二级类目
+            obj.sub = { id: sub.id, name: sub.name }
+            // 设置一级类目
+            obj.top = { id: top.id, name: top.name }
           }
-        }
+        })
       })
-      return cate
+      return obj
     })
     return { category }
   }

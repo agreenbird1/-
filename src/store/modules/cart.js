@@ -214,10 +214,12 @@ export default {
         }
       })
     },
-    getCartList ({ commit }) {
-      findCart().then(res => {
-        commit('setCartList', res.result)
-      })
+    getCartList (ctx) {
+      if (ctx.rootState.user.user.token) {
+        findCart().then(res => {
+          ctx.commit('setCartList', res.result)
+        })
+      }
     }
   },
   getters: {

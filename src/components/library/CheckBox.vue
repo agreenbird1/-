@@ -22,6 +22,7 @@ export default {
     // 用于控制点击切换效果
     // 这个复选框是通过两个图标的显示切换进行控制
     // useVModel 三个参数
+    // 是emit:updateModelValue的简写
     const checked = useVModel(props, 'modelValue', emit)
     const changeC = () => {
       const newVal = !checked.value

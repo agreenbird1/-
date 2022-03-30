@@ -4,10 +4,10 @@
       <!-- 面包屑 -->
       <Bread>
         <BreadItem to="/">首页</BreadItem>
-        <BreadItem :to="`/category/${product?.categories[1].id}`">{{
+        <BreadItem :to="`/category/${product?.categories[0].id}`">{{
           product?.categories[1].name
         }}</BreadItem>
-        <BreadItem :to="`/category/sub/${product?.categories[1].id}`">{{
+        <BreadItem :to="`/category/sub/${product?.categories[0].id}`">{{
           product?.categories[0].name
         }}</BreadItem>
         <BreadItem>{{ product?.name }}</BreadItem>

@@ -46,16 +46,20 @@ const routes = [
       {
         path: '/cart',
         component: Cart
-      }, {
+      },
+      {
         path: '/member/checkout',
         component: Checkout
-      }, {
+      },
+      {
         path: '/member/pay',
         component: Pay
-      }, {
+      },
+      {
         path: '/pay/callback',
         component: PayResult
-      }, {
+      },
+      {
         path: '/member',
         component: MemberLayout,
         children: [
@@ -67,13 +71,16 @@ const routes = [
             // 实现模糊匹配这里需要继续嵌套路由，所以用render函数渲染一个组件当作父组件
             path: '/member/order',
             component: { render: () => h(<RouterView />) },
-            children: [{
-              path: '',
-              component: MemberOrder
-            }, {
-              path: ':id',
-              component: MemberOrderDetail
-            }]
+            children: [
+              {
+                path: '',
+                component: MemberOrder
+              },
+              {
+                path: ':id',
+                component: MemberOrderDetail
+              }
+            ]
           }
         ]
       }
@@ -105,9 +112,9 @@ router.beforeEach((to, from, next) => {
     // 未登录状态
     // 跳转到登录页且携带当前被拦截的地址方便回跳
     next({ path: '/login', query: { redirectUrl: to.fullPath } })
+  } else {
+    next() // 否则直接放行
   }
-  // 否则直接放行
-  next()
 })
 
 export default router

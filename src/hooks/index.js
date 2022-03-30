@@ -8,16 +8,16 @@ import { ref } from 'vue'
  * @param { Element }  target - 被监听的 dom 元素
  * @param { Function } apiFn - 请求数据函数
  */
-export const getLazyData = (apiFn) => {
-  // 获取饭hi的结果
+export const getLazyData = apiFn => {
+  // 获取返回的结果
   const result = ref([])
   const target = ref(null)
   // 获得的是停止监听的函数
   const { stop } = useIntersectionObserver(
     target,
     // isIntersecting 是否已经进入可视区 Boolean
-    // observerElement 被监听的元素
-    ([{ isIntersecting }], observerElement) => {
+    // intersectionObserverEntry对象数组，里面是各种阈值
+    ([{ isIntersecting }]) => {
       if (isIntersecting) {
         // 进入可视区停止监听并进行数据请求分发
         stop()

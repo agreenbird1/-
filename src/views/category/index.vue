@@ -71,7 +71,6 @@ export default {
     const getSubCategories = () => {
       findTopCategories(route.params.id).then(data => {
         subCategory.value = data.result.children
-        console.log(data)
       })
     }
 

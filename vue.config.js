@@ -2,7 +2,7 @@ const path = require('path')
 
 module.exports = {
   pluginOptions: {
-    // 共享样式、变量
+    // less共享样式、变量
     'style-resources-loader': {
       preProcessor: 'less',
       // 哪些文件需要自动注入

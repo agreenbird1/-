@@ -8,7 +8,7 @@ export default {
     // 返回的值就是当前组件的内容
     // h 第一个参数 标签名字  第二个参数 标签属性对象  第三个参数 子节点
     // <i class="iconfont icon-angle-right"></i>
-    // 获取默认插槽内的内容
+    // 获取默认插槽内的内容，就是内嵌的item组件。
     const items = this.$slots.default()
     const dynamicItems = []
     items.forEach((item, index) => {
@@ -18,6 +18,7 @@ export default {
         dynamicItems.push(h('i', { class: 'iconfont icon-angle-right' }))
       }
     })
+    // 标签 、props、和子元素
     return h('div', { class: 'xtx-bread' }, dynamicItems)
   }
 }
