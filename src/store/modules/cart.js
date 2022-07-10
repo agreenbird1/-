@@ -47,7 +47,7 @@ export default {
     },
     selectedLocalAll (state, payload) {
       payload.newList.forEach(goods => {
-        goods.selected = payload.newSelected
+        goods.selected = payload.selected
       })
     },
     // 清空本地购物车

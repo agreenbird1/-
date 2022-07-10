@@ -1,61 +1,42 @@
 <template>
   <div class="order-item">
     <div class="head">
-      <span>下单时间：{{ order.createTime }}</span>
-      <span>订单编号：{{ order.id }}</span>
-      <!-- 未付款，倒计时时间还有 -->
-      <span class="down-time" v-if="order.orderState === 1">
+      <span>下单时间：{{order.createTime}}</span>
+      <span>订单编号：{{order.id}}</span>
+      <span class="down-time" v-if="order.orderState===1">
         <i class="iconfont icon-down-time"></i>
-        <b v-if="order.countdown > 0">
-          付款截止：{{ Math.floor(order.countdown / 60) }}分{{
-            order.countdown % 60
-          }}秒
-        </b>
-        <b style="color: red">已超时！</b>
+        <b>付款截止：{{timeText}}</b>
       </span>
-      <!-- 已完成 已取消 -->
-      <a
-        v-if="[5, 6].includes(order.orederState)"
-        href="javascript:;"
-        class="del"
-        >删除</a
-      >
+      <a @click="$emit('on-delete', order)" href="javascript:;" class="del" v-if="[5,6].includes(order.orderState)">删除</a>
     </div>
     <div class="body">
       <div class="column goods">
         <ul>
           <li v-for="goods in order.skus" :key="goods.id">
-            <a class="image" href="javascript:;">
+            <RouterLink class="image" :to="`/product/${goods.spuId}`">
               <img :src="goods.image" alt="" />
-            </a>
+            </RouterLink>
             <div class="info">
-              <p class="name ellipsis-2">{{ goods.name }}</p>
-              <p class="attr ellipsis">{{ goods.attrsText }}</p>
+              <p class="name ellipsis-2">{{goods.name}}</p>
+              <p class="attr ellipsis">{{goods.attrsText}}</p>
             </div>
-            <div class="price">¥{{ goods.realPay }}</div>
-            <div class="count">x{{ goods.quantity }}</div>
+            <div class="price">¥{{goods.realPay}}</div>
+            <div class="count">x{{goods.quantity}}</div>
           </li>
         </ul>
       </div>
       <div class="column state">
-        <p>{{ orderStatus[order.orderState].label }}</p>
-        <!-- 待收货：查看物流 -->
-        <!-- 待评价：评价商品 -->
-        <!-- 已完成：查看评价 -->
-
-        <p v-if="order.orderState === 3">
-          <a href="javascript:;" class="green">查看物流</a>
-        </p>
-        <p v-if="order.orderState === 4">
-          <a href="javascript:;" class="green">评价商品</a>
-        </p>
-        <p v-if="order.orderState === 5">
-          <a href="javascript:;" class="green">查看评价</a>
-        </p>
+        <p>{{orderStatus[order.orderState].label}}</p>
+        <!-- 待收货  查看物流 -->
+        <!-- 待评价  评价商品 -->
+        <!-- 已完成  查看评价 -->
+        <p @click="$emit('on-logistics', order)" v-if="order.orderState===3"><a class="green" href="javascript:;">查看物流</a></p>
+        <p v-if="order.orderState===4"><a class="green" href="javascript:;">评价商品</a></p>
+        <p v-if="order.orderState===5"><a class="green" href="javascript:;">查看评价</a></p>
       </div>
       <div class="column amount">
-        <p class="red">¥{{ order.payMoney }}</p>
-        <p>（含运费：¥{{ order.postFee }}）</p>
+        <p class="red">¥{{order.payMoney}}</p>
+        <p>（含运费：¥{{order.postFee}}）</p>
         <p>在线支付</p>
       </div>
       <div class="column action">
@@ -65,27 +46,19 @@
         <!-- 待评价：查看详情，再次购买，申请售后 -->
         <!-- 已完成：查看详情，再次购买，申请售后 -->
         <!-- 已取消：查看详情 -->
-        <MyButton v-if="order.orderState === 1" type="primary" size="small"
-          >立即付款</MyButton
-        >
-        <MyButton v-if="order.orderState === 3" type="primary" size="small"
-          >确认收货</MyButton
-        >
-        <p><a href="javascript:;">查看详情</a></p>
-        <p v-if="order.orderState === 1"><a href="javascript:;">取消订单</a></p>
-        <p v-if="[2, 3, 4, 5].includes(order.orderState)">
-          <a href="javascript:;">再次购买</a>
-        </p>
-        <p v-if="[4, 5].includes(order.orderState)">
-          <a href="javascript:;">申请售后</a>
-        </p>
+        <MyButton @click="$router.push(`/member/pay?orderId=${order.id}`)" v-if="order.orderState===1" type="primary" size="small">立即付款</MyButton>
+        <MyButton @click="$emit('on-confirm', order)" v-if="order.orderState===3" type="primary" size="small">确认收货</MyButton>
+        <p><a  @click="$router.push(`/member/order/${order.id}`)" href="javascript:;">查看详情</a></p>
+        <p @click="$emit('on-cancel', order)" v-if="order.orderState===1"><a href="javascript:;">取消订单</a></p>
+        <p @click="$router.push(`/member/checkout?orderId=${order.id}`)" v-if="[2,3,4,5].includes(order.orderState)"><a href="javascript:;">再次购买</a></p>
+        <p v-if="[4,5].includes(order.orderState)"><a href="javascript:;">申请售后</a></p>
       </div>
     </div>
   </div>
 </template>
-
 <script>
-import { orderStatus } from '@/api/constance'
+import { orderStatus } from '../../../../api/constance'
+import { usePayTime } from '@/hooks'
 export default {
   name: 'OrderItem',
   props: {
@@ -94,15 +67,16 @@ export default {
       default: () => ({})
     }
   },
-  setup () {
-    return {
-      orderStatus
-    }
+  emits: ['on-cancel', 'on-delete', 'on-confirm', 'on-logistics'],
+  setup (props) {
+    const { start, timeText } = usePayTime()
+    start(props.order.countdown)
+
+    return { orderStatus, timeText }
   }
 }
 </script>
-
-<style scoped lang='less'>
+<style scoped lang="less">
 .order-item {
   margin-bottom: 20px;
   border: 1px solid #f5f5f5;

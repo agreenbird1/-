@@ -170,13 +170,13 @@
   </div>
 </template>
 <script>
-import { useStore } from 'vuex'
 import confirm from '@/components/library/Confirm'
 import message from '@/components/library/Message'
 import GoodRelevant from '@/views/goods/components/GoodsRelevant.vue'
+import { useRouter } from 'vue-router'
+import { useStore } from 'vuex'
 import CartNone from './components/CartNone.vue'
 import CartSku from './components/CartSku.vue'
-import { useRouter } from 'vue-router'
 export default {
   name: 'XtxCartPage',
   components: { GoodRelevant, CartNone, CartSku },
@@ -188,7 +188,6 @@ export default {
     }
     // 全选
     const selectedAll = newVal => {
-      console.log(newVal)
       store.dispatch('cart/selectedAll', newVal)
     }
     // 单个删除

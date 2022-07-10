@@ -57,7 +57,7 @@ export default {
 .down {
   &-enter {
     &-from {
-      transform: translate3d(0, -75px, 0);
+      transform: translateY(-75px);
       opacity: 0;
     }
     &-active {

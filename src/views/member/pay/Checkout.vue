@@ -10,10 +10,7 @@
         <!-- 收货地址 -->
         <h3 class="box-title">收货地址</h3>
         <div class="box-body">
-          <CheckoutAddress
-            @change="changeAddress"
-            :list="order.userAddresses"
-          />
+          <CheckoutAddress @change="changeAddress" :list="order.userAddresses" />
         </div>
         <!-- 商品信息 -->
         <h3 class="box-title">商品信息</h3>
@@ -50,9 +47,7 @@
         <!-- 配送时间 -->
         <h3 class="box-title">配送时间</h3>
         <div class="box-body">
-          <a class="my-btn active" href="javascript:;"
-            >不限送货时间：周一至周日</a
-          >
+          <a class="my-btn active" href="javascript:;">不限送货时间：周一至周日</a>
           <a class="my-btn" href="javascript:;">工作日送货：周一至周五</a>
           <a class="my-btn" href="javascript:;">双休日、假日送货：周六至周日</a>
         </div>
@@ -95,26 +90,35 @@
 </template>
 <script>
 import { ref, reactive } from 'vue'
-import { useRouter } from 'vue-router'
-import { findCheckoutOrder, createOrder } from '@/api/order'
+import { useRouter, useRoute } from 'vue-router'
+import { findCheckoutOrder, createOrder, repurchaseOrder } from '@/api/order'
 import message from '@/components/library/Message'
 import CheckoutAddress from './components/CheckoutAddress.vue'
 export default {
   name: 'Checkout',
   components: { CheckoutAddress },
   setup () {
+    const route = useRoute()
     // 订单信息
     const order = ref(null)
-    findCheckoutOrder().then(data => {
-      order.value = data.result
-      // 设置提交时候的商品
-      reqParams.goods = data.result.goods.map(item => {
-        return {
-          skuId: item.skuId,
-          count: item.count
-        }
+    if (route.query.orderId) {
+      // 按照订单中商品结算
+      repurchaseOrder(route.query.orderId).then(data => {
+        order.value = data.result
+        reqParams.goods = data.result.goods.map(({ skuId, count }) => ({ skuId, count }))
       })
-    })
+    } else {
+      findCheckoutOrder().then(data => {
+        order.value = data.result
+        // 设置提交时候的商品
+        reqParams.goods = data.result.goods.map(item => {
+          return {
+            skuId: item.skuId,
+            count: item.count
+          }
+        })
+      })
+    }
 
     // 提交订单 - 信息
     const reqParams = reactive({
@@ -149,6 +153,7 @@ export default {
   .wrapper {
     background: #fff;
     padding: 0 20px;
+
     .box-title {
       font-size: 16px;
       font-weight: normal;
@@ -156,42 +161,51 @@ export default {
       line-height: 70px;
       border-bottom: 1px solid #f5f5f5;
     }
+
     .box-body {
       padding: 20px 0;
     }
   }
 }
+
 .address {
   border: 1px solid #f5f5f5;
   display: flex;
   align-items: center;
+
   .text {
     flex: 1;
     min-height: 90px;
     display: flex;
     align-items: center;
+
     .none {
       line-height: 90px;
       color: #999;
       text-align: center;
       width: 100%;
     }
-    > ul {
+
+    >ul {
       flex: 1;
       padding: 20px;
+
       li {
         line-height: 30px;
+
         span {
           color: #999;
           margin-right: 5px;
-          > i {
+
+          >i {
             width: 0.5em;
             display: inline-block;
           }
         }
       }
     }
-    > a {
+
+    >a {
       color: @xtxColor;
       width: 160px;
       text-align: center;
@@ -200,34 +214,42 @@ export default {
       border-right: 1px solid #f5f5f5;
     }
   }
+
   .action {
     width: 420px;
     text-align: center;
+
     .btn {
       width: 140px;
       height: 46px;
       line-height: 44px;
       font-size: 14px;
+
       &:first-child {
         margin-right: 10px;
       }
     }
   }
 }
+
 .goods {
   width: 100%;
   border-collapse: collapse;
   border-spacing: 0;
+
   .info {
     display: flex;
     text-align: left;
+
     img {
       width: 70px;
       height: 70px;
       margin-right: 20px;
     }
+
     .right {
       line-height: 24px;
+
       p {
         &:last-child {
           color: #999;
@@ -235,25 +257,30 @@ export default {
       }
     }
   }
+
   tr {
     th {
       background: #f5f5f5;
       font-weight: normal;
     }
+
     td,
     th {
       text-align: center;
       padding: 20px;
       border-bottom: 1px solid #f5f5f5;
+
       &:first-child {
         border-left: 1px solid #f5f5f5;
       }
+
       &:last-child {
         border-right: 1px solid #f5f5f5;
       }
     }
   }
 }
+
 .my-btn {
   width: 228px;
   height: 50px;
@@ -263,26 +290,31 @@ export default {
   margin-right: 25px;
   color: #666666;
   display: inline-block;
+
   &.active,
   &:hover {
     border-color: @xtxColor;
   }
 }
+
 .total {
   dl {
     display: flex;
     justify-content: flex-end;
     line-height: 50px;
+
     dt {
       i {
         display: inline-block;
         width: 2em;
       }
     }
+
     dd {
       width: 240px;
       text-align: right;
       padding-right: 70px;
+
       &.price {
         font-size: 20px;
         color: @priceColor;
@@ -290,6 +322,7 @@ export default {
     }
   }
 }
+
 .submit {
   text-align: right;
   padding: 60px;

@@ -71,7 +71,7 @@ export default {
 }
 </script>
 
-<style scoped lang='less'>
+<style scoped lang="less">
 .app-footer {
   overflow: hidden;
   background-color: #f5f5f5;
